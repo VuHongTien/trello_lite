@@ -15,11 +15,6 @@ class User(AbstractBaseUser, PermissionsMixin, SafeDeleteModel):
     email = models.EmailField(max_length=settings.CHARFIELD_LENGTH, unique=True)
     name = models.CharField(max_length=settings.CHARFIELD_LENGTH)
     tel = models.CharField(max_length=settings.CHARFIELD_LENGTH)
-    verify_email_token = models.CharField(max_length=settings.CHARFIELD_LENGTH)
-    verify_email_token_expired_at = models.DateTimeField(null=True)
-    is_active = models.BooleanField(default=False)
-    reset_password_token = models.CharField(max_length=settings.CHARFIELD_LENGTH)
-    reset_password_token_expired_at = models.DateTimeField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -28,14 +23,6 @@ class User(AbstractBaseUser, PermissionsMixin, SafeDeleteModel):
     class Meta:
         app_label = 'users'
         db_table = 'user'
-
-    @property
-    def full_name(self):
-        return self.name
-
-    @property
-    def short_name(self):
-        return self.name
 
     def __str__(self):
         return self.email
