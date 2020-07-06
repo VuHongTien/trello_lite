@@ -4,6 +4,8 @@ from django.conf.urls import url, include
 
 urlpatterns = [
     url('api/users/', include('users.urls')),
+    url('api/projects/', include('projects.urls')),
+    url('api/tasks/', include('tasks.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

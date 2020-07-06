@@ -10,7 +10,8 @@ from .services import *
 from .models import User
 from auth_tokens.services import create_token
 from utils.serializer_validator import validate_serializer
-from utils.mailers import send_verify_email, send_reset_password_token
+from projects.models import Project
+from projects.services import get_projects_by
 
 
 class UserSignInApi(APIView):
@@ -56,32 +57,10 @@ class UserSignUpApi(APIView):
         request_serializer = self.RequestSerializer(data=request.data)
         validate_serializer(serializer=request_serializer)
         user = create_user(**request_serializer.validated_data)
-        send_verify_email(user)
         response_serializer = self.ResponseSerializer(user)
         return Response({
             'user': response_serializer.data
         }, status=status.HTTP_201_CREATED)
-
-
-class UserVerification(APIView):
-    permission_classes = [AllowAny, ]
-
-    class RequestSerializer(serializers.Serializer):
-        email_token = serializers.CharField(required=True, max_length=settings.CHARFIELD_LENGTH)
-
-    class ResponseSerializer(serializers.ModelSerializer):
-        class Meta:
-            model = User
-            fields = ['id', 'is_active']
-
-    def post(self, request):
-        request_serializer = self.RequestSerializer(data=request.data)
-        validate_serializer(serializer=request_serializer)
-        user = verify_email(**request_serializer.validated_data)
-        response_serializer = self.ResponseSerializer(user)
-        return Response({
-            'user': response_serializer.data
-        }, status=status.HTTP_200_OK)
 
 
 class UserDetailApi(APIView):
@@ -150,58 +129,17 @@ class UserChangePasswordApi(APIView):
         }, status=status.HTTP_200_OK)
 
 
-class UserRequestResetPasswordApi(APIView):
-    permission_classes = [AllowAny, ]
-
+class UserListProjectsApi(APIView):
     class RequestSerializer(serializers.Serializer):
-        email = serializers.EmailField(required=True, max_length=settings.CHARFIELD_LENGTH)
-
-    def post(self, request):
-        serializer = self.RequestSerializer(data=request.data)
-        validate_serializer(serializer=serializer)
-        user = gen_reset_password_token(**serializer.validated_data)
-        send_reset_password_token(user=user)
-        return Response({
-
-        }, status=status.HTTP_200_OK)
-
-
-class UserResetPasswordApi(APIView):
-    permission_classes = [AllowAny, ]
-
-    class RequestSerializer(serializers.Serializer):
-        reset_password_token = serializers.CharField(required=True, max_length=settings.CHARFIELD_LENGTH)
-        password = serializers.CharField(required=True, max_length=settings.CHARFIELD_LENGTH)
-        password_confirm = serializers.CharField(required=True, max_length=settings.CHARFIELD_LENGTH)
+        project_id = serializers.IntegerField(required=True)
 
     class ResponseSerializer(serializers.ModelSerializer):
-        class Meta:
-            model = User
-            fields = ['id', 'name', 'email', 'tel', 'created_at', 'updated_at']
+        model = Project
 
-    def put(self, request):
-        request_serializer = self.RequestSerializer(data=request.data)
-        validate_serializer(serializer=request_serializer)
-        user = reset_password(**request_serializer.validated_data)
-        response_serializer = self.ResponseSerializer(user)
-        return Response({
-            'user': response_serializer.data
-        }, status=status.HTTP_200_OK)
-
-
-class UserDeactivateApi(APIView):
-    permission_classes = [UserPermission, ]
-
-    class ResponseSerializer(serializers.ModelSerializer):
-        class Meta:
-            model = User
-            fields = ['id', 'name', 'email', 'tel', 'created_at', 'updated_at']
-
-    def delete(self, request, user_id):
+    def get(self, request, user_id):
         user = get_user_by(id=user_id)
-        self.check_object_permissions(request=request, obj=user)
-        deactivate_user(user)
-        response_serializer = self.ResponseSerializer(user)
+        projects = get_projects_by(admin=user)
+        response_serializer = self.ResponseSerializer(projects, many=True)
         return Response({
-            'user': response_serializer.data
+            'projects': response_serializer.data
         }, status=status.HTTP_200_OK)

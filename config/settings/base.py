@@ -25,6 +25,8 @@ INSTALLED_APPS = [
 
     'auth_tokens',
     'users',
+    'projects',
+    'tasks'
 ]
 
 MIDDLEWARE = [
