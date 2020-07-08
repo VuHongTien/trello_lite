@@ -24,7 +24,7 @@ class UserSignInApi(APIView):
     class ResponseSerializer(serializers.ModelSerializer):
         class Meta:
             model = User
-            fields = ['id', 'name', 'email', 'tel', 'created_at', 'updated_at']
+            fields = ['id', 'name', 'email', 'tel']
 
     def post(self, request):
         request_serializer = self.RequestSerializer(data=request.data)
@@ -51,7 +51,7 @@ class UserSignUpApi(APIView):
     class ResponseSerializer(serializers.ModelSerializer):
         class Meta:
             model = User
-            fields = ['id', 'name', 'email', 'tel', 'created_at', 'updated_at']
+            fields = ['id', 'name', 'email', 'tel']
 
     def post(self, request):
         request_serializer = self.RequestSerializer(data=request.data)
@@ -69,7 +69,7 @@ class UserDetailApi(APIView):
     class ResponseSerializer(serializers.ModelSerializer):
         class Meta:
             model = User
-            fields = ['id', 'name', 'email', 'tel', 'created_at', 'updated_at']
+            fields = ['id', 'name', 'email', 'tel']
 
     def get(self, request, user_id):
         user = get_user_by(id=user_id)
@@ -90,12 +90,12 @@ class UserUpdateApi(APIView):
     class ResponseSerializer(serializers.ModelSerializer):
         class Meta:
             model = User
-            fields = ['id', 'name', 'email', 'tel', 'created_at', 'updated_at']
+            fields = ['id', 'name', 'email', 'tel']
 
-    def put(self, request, user_id):
+    def put(self, request):
         request_serializer = self.RequestSerializer(data=request.data)
         validate_serializer(serializer=request_serializer)
-        user = get_user_by(id=user_id)
+        user = request.user
         self.check_object_permissions(request=request, obj=user)
         user = update_user(user=user, **request_serializer.validated_data)
         response_serializer = self.ResponseSerializer(user)
@@ -115,12 +115,12 @@ class UserChangePasswordApi(APIView):
     class ResponseSerializer(serializers.ModelSerializer):
         class Meta:
             model = User
-            fields = ['id', 'name', 'email', 'tel', 'created_at', 'updated_at']
+            fields = ['id', 'name', 'email', 'tel']
 
-    def put(self, request, user_id):
+    def put(self, request):
         request_serializer = self.RequestSerializer(data=request.data)
         validate_serializer(serializer=request_serializer)
-        user = get_user_by(id=user_id)
+        user = request.user
         self.check_object_permissions(request=request, obj=user)
         user = change_password(user=user, **request_serializer.validated_data)
         response_serializer = self.ResponseSerializer(user)

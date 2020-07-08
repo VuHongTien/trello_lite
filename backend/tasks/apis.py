@@ -57,6 +57,7 @@ class TaskUpdateApi(APIView):
 
     class RequestSerializer(serializers.Serializer):
         detail = serializers.CharField(required=True)
+        status = serializers.IntegerField(required=True)
 
     class ResponseSerializer(serializers.ModelSerializer):
         class Meta:
@@ -66,8 +67,9 @@ class TaskUpdateApi(APIView):
     def put(self, request, task_id):
         request_serializer = self.RequestSerializer(data=request.data)
         validate_serializer(serializer=request_serializer)
-        task = get_tasks_by(id=task_id)
-        update_task(task=task, detail=request_serializer.validated_data['detail'])
+        task = get_tasks_by(id=task_id).first()
+        task = update_task(task=task, detail=request_serializer.validated_data['detail'],
+                           status=request_serializer.validated_data['status'])
         self.check_object_permissions(request=request, obj=task)
         response_serializer = self.ResponseSerializer(task)
         return Response({
@@ -84,9 +86,9 @@ class TaskDeleteApi(APIView):
             fields = '__all__'
 
     def delete(self, request, task_id):
-        task = get_tasks_by(id=task_id)
+        task = get_tasks_by(id=task_id).first()
         self.check_object_permissions(request=request, obj=task)
-        delete_task(task=task)
+        task = delete_task(task=task)
         response_serializer = self.ResponseSerializer(task)
         return Response({
             'task': response_serializer.data

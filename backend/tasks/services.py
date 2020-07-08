@@ -20,8 +20,9 @@ def create_task(project_id, detail):
     return task
 
 
-def update_task(task, detail):
+def update_task(task, detail, status):
     task.detail = detail
+    task.status = status
     task.save()
     return task
 
