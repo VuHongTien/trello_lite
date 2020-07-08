@@ -10,6 +10,7 @@ from .models import Project
 from .services import *
 from utils.exceptions import *
 from projects.permissions import *
+from tasks.models import Task
 
 
 class ProjectCreateApi(APIView):
@@ -57,9 +58,16 @@ class ProjectDetailApi(APIView):
     permission_classes = [UserPermission, ]
 
     class ResponseSerializer(serializers.ModelSerializer):
+        class TaskSerializer(serializers.ModelSerializer):
+            class Meta:
+                model = Task
+                exclude = ['deleted']
+
+        tasks = TaskSerializer(many=True)
+
         class Meta:
             model = Project
-            fields = '__all__'
+            fields = ['tasks']
 
     def get(self, request, project_id):
         self.check_permissions(request=request)
