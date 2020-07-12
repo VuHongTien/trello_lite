@@ -8,6 +8,7 @@
                 required
                 size="lg"
                 placeholder="Add new task"
+                :disabled="!editable"
                 @keyup.enter="createTask"
             ></b-form-input>
             <task-item
@@ -37,6 +38,13 @@
                 .then(() => {
                     this.tasks = this.$store.getters['tasks/tasks']
                 })
+        },
+        computed: {
+            editable: function () {
+                return this.$store.getters['users/user'].id === this.$store.getters['projects/projects'].find(project => {
+                    return project.id === parseInt(this.$route.params.projectId)
+                }).admin
+            }
         },
         methods: {
             createTask: function () {

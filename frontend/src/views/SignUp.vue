@@ -2,7 +2,7 @@
     <div class="page-wrapper">
         <b-container class="page">
             <b-card
-                title="Sign in"
+                title="Sign up"
                 class="mb-2 form-card"
             >
                 <b-card-text>

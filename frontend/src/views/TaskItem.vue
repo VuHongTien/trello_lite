@@ -2,7 +2,7 @@
     <div>
         <b-card
             class="task-card"
-            @dblclick="$bvModal.show(modalId)"
+            @dblclick="editable && $bvModal.show(modalId)"
         >
             <h3>{{task.detail}}</h3>
             <b-link
@@ -11,6 +11,7 @@
             >{{dict.find(item => item.value === task.status).text}}
             </b-link>
             <b-button-close
+                v-if="editable"
                 class="button-close"
                 @click="deleteTask"
             />
@@ -77,6 +78,11 @@
         computed: {
             modalId: function () {
                 return `modal-update-${this.task.id}`
+            },
+            editable: function () {
+                return this.$store.getters['users/user'].id === this.$store.getters['projects/projects'].find(project => {
+                    return project.id === parseInt(this.$route.params.projectId)
+                }).admin
             }
         },
         methods: {

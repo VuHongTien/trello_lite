@@ -14,6 +14,8 @@ def get_projects_by(with_deleted=False, raise_exception=True, **kwargs):
 
 def create_project(user, **kwargs):
     project = Project.objects.create(admin=user, **kwargs)
+    project.users.add(user)
+    project.save()
     return project
 
 
