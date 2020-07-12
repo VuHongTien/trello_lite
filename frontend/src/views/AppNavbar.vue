@@ -5,7 +5,7 @@
             type="dark"
             variant="dark"
         >
-            <b-navbar-brand href="#">
+            <b-navbar-brand href="/projects">
                 <img
                     src="../assets/logo.png"
                     alt="Logo"
